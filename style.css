@@ -273,7 +273,6 @@ span.store__accent__1 {
   background-color: #999;
   padding: 100px 0; /* Даем секции больше "воздуха" сверху и снизу */
   color: var(--silver);
-  z-index: 10;
 }
 
 .grid__advantages__background {
@@ -1868,7 +1867,7 @@ font-size: 28px;
 
 @media (max-width: 900px) {
 
-  .planner__container { flex-direction: column; }
+  .planner__container { flex-direction: column; gap: 0px; }
   .planner__content { max-width: 100%; margin-bottom: 40px; }
   .planner__cards { height: 305px;  flex: auto; }
   .planner__card { max-width: 65%; }
