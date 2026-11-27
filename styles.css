@@ -202,7 +202,7 @@ img {
   border-radius: 10px;
   background: linear-gradient(180deg, var(--surface) 0%, var(--paper-alt) 100%);
   border: 1px solid var(--rule-strong);
-  padding: 6px 4px 0 4px;
+  /* padding: 6px 4px 0 4px; */
   display: flex;
   align-items: flex-end;
   justify-content: center;
