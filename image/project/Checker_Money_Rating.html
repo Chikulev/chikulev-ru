@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checker Money Rating — Твоё место в мировом рейтинге богатства</title>
+  <meta name="description" content="Узнай своё точное место среди 8,3 миллиардов людей на Земле по доходу или имуществу. Живой одометр, цепочка человечества, симулятор роста и сравнение с друзьями." />
+  <meta property="og:title" content="Checker Money Rating — Твоё место среди 8,3 млрд людей" />
+  <meta property="og:description" content="Проверь, на каком месте ты находишься среди всех жителей планеты по доходу или капиталу." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://https://chikulev.ru/Checker_Money_Rating.html/" />
+  <meta name="theme-color" content="#F4F6FA" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS 3.4.17 -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Chart.js 4.4.1, Lucide 0.460.0, Canvas Confetti 1.9.3 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* Ambient Light & Dark backgrounds */
+    .bg-app-light {
+      background-color: #F2F5FA;
+      background-image:
+        radial-gradient(ellipse 70% 50% at 15% 0%, rgba(16, 185, 129, 0.10), transparent 60%),
+        radial-gradient(ellipse 60% 45% at 88% 100%, rgba(245, 158, 11, 0.09), transparent 60%);
+    }
+    html.dark .bg-app-light {
+      background-color: #070A12;
+      background-image:
+        radial-gradient(ellipse 65% 45% at 50% -10%, rgba(16, 185, 129, 0.14), transparent 65%),
+        radial-gradient(ellipse 45% 35% at 90% 95%, rgba(245, 158, 11, 0.10), transparent 60%);
+    }
+
+    /* Mechanical Odometer — Light Theme Default */
+    .odo-shell {
+      background: linear-gradient(180deg, #F8FAFC 0%, #EEF2F7 50%, #E7ECF4 100%);
+      border: 1px solid #DCE3EE;
+      box-shadow:
+        inset 0 2px 6px rgba(15, 23, 42, 0.05),
+        0 14px 32px -12px rgba(15, 23, 42, 0.10);
+    }
+    html.dark .odo-shell {
+      background: linear-gradient(180deg, #05070B 0%, #0C111E 50%, #05070B 100%);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      box-shadow:
+        inset 0 6px 18px rgba(0, 0, 0, 0.85),
+        inset 0 -6px 16px rgba(0, 0, 0, 0.85),
+        0 18px 42px -12px rgba(16, 185, 129, 0.22);
+    }
+
+    .odo-digit-window {
+      position: relative;
+      width: 2.0rem;
+      height: 3.35rem;
+      overflow: hidden;
+      border-radius: 0.55rem;
+      background: linear-gradient(180deg, #E2E8F0 0%, #FFFFFF 22%, #FFFFFF 78%, #DDE4EE 100%);
+      border: 1px solid #CBD5E1;
+      box-shadow:
+        0 2px 6px rgba(15, 23, 42, 0.08),
+        inset 0 3px 5px rgba(15, 23, 42, 0.06),
+        inset 0 -3px 5px rgba(15, 23, 42, 0.06);
+    }
+    html.dark .odo-digit-window {
+      background: linear-gradient(180deg, #06080E 0%, #131B2E 22%, #172138 50%, #111829 78%, #05070C 100%);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.72), inset 0 -4px 8px rgba(0, 0, 0, 0.72);
+    }
+
+    @media (min-width: 640px) {
+      .odo-digit-window {
+        width: 2.95rem;
+        height: 4.45rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .odo-digit-window {
+        width: 3.35rem;
+        height: 4.95rem;
+      }
+    }
+
+    .odo-digit-window::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: rgba(15, 23, 42, 0.09);
+      pointer-events: none;
+      z-index: 3;
+    }
+    html.dark .odo-digit-window::after {
+      background: rgba(0, 0, 0, 0.48);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .odo-ribbon {
+      display: flex;
+      flex-direction: column;
+      transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+
+    .odo-cell {
+      height: 3.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 1.75rem;
+      line-height: 1;
+      color: #0F172A;
+      user-select: none;
+    }
+    html.dark .odo-cell {
+      color: #F8FAFC;
+      text-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+    }
+
+    @media (min-width: 640px) {
+      .odo-cell {
+        height: 4.45rem;
+        font-size: 2.65rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .odo-cell {
+        height: 4.95rem;
+        font-size: 3.05rem;
+      }
+    }
+
+    .odo-dim .odo-cell {
+      color: #CBD5E1;
+    }
+    html.dark .odo-dim .odo-cell {
+      color: rgba(148, 163, 184, 0.24);
+      text-shadow: none;
+    }
+
+    .odo-sep {
+      width: 0.4rem;
+    }
+    @media (min-width: 640px) {
+      .odo-sep {
+        width: 0.75rem;
+      }
+    }
+
+    /* Page transition */
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateX(14px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .page-panel.active {
+      display: block;
+      animation: pageIn 260ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .page-panel {
+      display: none;
+    }
+
+    /* Live world pop pulse */
+    @keyframes popBump {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+    .pop-bump {
+      animation: popBump 280ms ease-out;
+    }
+
+    /* Animated chain connector */
+    @keyframes flowLine {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    .chain-connector {
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.18), rgba(16, 185, 129, 0.85), rgba(245, 158, 11, 0.75), rgba(16, 185, 129, 0.18));
+      background-size: 200% 100%;
+      animation: flowLine 3.2s linear infinite;
+    }
+
+    @keyframes pulseRing {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
+      70% { box-shadow: 0 0 0 11px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .you-node-pulse {
+      animation: pulseRing 2.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    }
+
+    /* Custom slider */
+    input[type="range"].wealth-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #CBD5E1 0%, #10B981 55%, #F59E0B 100%);
+      outline: none;
+    }
+    html.dark input[type="range"].wealth-slider {
+      background: linear-gradient(90deg, #334155 0%, #10B981 55%, #F59E0B 100%);
+    }
+    input[type="range"].wealth-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: #FFFFFF;
+      border: 3px solid #10B981;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.45);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    input[type="range"].wealth-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.14);
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body class="bg-app-light text-slate-900 dark:text-slate-100 min-h-screen flex flex-col items-center justify-center p-3 sm:p-5 lg:p-7 antialiased selection:bg-emerald-500/25">
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300">
+    <div class="bg-slate-900 dark:bg-slate-800 text-white border border-slate-700 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 text-sm font-medium">
+      <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+      <span id="toastText">Готово</span>
+    </div>
+  </div>
+
+  <!-- HORIZONTAL MULTI-PAGE APP SHELL ("Квадрат-приложение") -->
+  <div class="w-full max-w-5xl bg-white/95 dark:bg-[#0D121F]/95 border border-slate-200/90 dark:border-slate-800/90 rounded-[28px] shadow-2xl shadow-slate-900/10 dark:shadow-black/50 backdrop-blur-xl overflow-hidden flex flex-col">
+
+    <!-- TOP BAR: Brand + Page Switcher + Theme & Sound -->
+    <header class="px-4 sm:px-6 py-3.5 border-b border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-3 bg-slate-50/70 dark:bg-slate-950/40">
+      <!-- Brand -->
+      <div class="flex items-center gap-2.5 shrink-0">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shadow-emerald-500/20 text-white">
+          <i data-lucide="gauge" class="w-5 h-5"></i>
+        </div>
+        <div class="leading-tight">
+          <div class="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 dark:text-white">
+            checker-money-rating<span class="text-emerald-600 dark:text-emerald-400"> by Chikulev</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>На Земле сейчас:</span>
+            <span id="liveWorldPopHeader" class="font-mono font-bold text-slate-700 dark:text-slate-200 tabular-nums inline-block">8 298 979 488</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multi-Page Switcher Tabs -->
+      <nav class="order-3 lg:order-2 w-full lg:w-auto flex items-center justify-between lg:justify-center gap-1 bg-slate-200/70 dark:bg-slate-900/90 p-1 rounded-2xl border border-slate-200 dark:border-slate-800">
+        <button data-page="rating" class="page-tab flex-1 lg:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm">
+          Рейтинг
+        </button>
+        <button data-page="chain" class="page-tab flex-1 lg:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+          Цепочка
+        </button>
+        <button data-page="simulator" class="page-tab flex-1 lg:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+          Симулятор
+        </button>
+        <button data-page="battle" class="page-tab flex-1 lg:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+          Сравнить
+        </button>
+      </nav>
+
+      <!-- Right Controls: Sound + Theme Toggle -->
+      <div class="order-2 lg:order-3 flex items-center gap-1.5">
+        <button id="soundToggleBtn" title="Звук одометра" class="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <i data-lucide="volume-2" class="w-4 h-4"></i>
+        </button>
+        <button id="themeToggleBtn" title="Переключить светлую / тёмную тему" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+          <i id="themeIconSun" data-lucide="sun" class="w-4 h-4 text-amber-500 hidden dark:block"></i>
+          <i id="themeIconMoon" data-lucide="moon" class="w-4 h-4 text-slate-600 block dark:hidden"></i>
+          <span id="themeBtnLabel" class="hidden sm:inline">Тёмная</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Challenge Banner (when opened via friend's link) -->
+    <div id="challengeBanner" class="hidden px-4 sm:px-6 pt-4">
+      <div class="rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2 text-xs sm:text-sm text-amber-900 dark:text-amber-100 font-medium">
+          <i data-lucide="trophy" class="w-4 h-4 text-amber-500 shrink-0"></i>
+          <span id="challengeText">Друг бросил тебе вызов! Введи свои цифры, чтобы узнать, кто выше.</span>
+        </div>
+        <button id="dismissChallengeBtn" class="text-xs font-bold text-amber-700 dark:text-amber-300 hover:underline">Скрыть</button>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT STAGE (Fixed-feel multi-page canvas) -->
+    <main class="p-4 sm:p-6 lg:p-8 flex-1">
+
+      <!-- =================================================================== -->
+      <!-- PAGE 1: RATING & 3D ODOMETER -->
+      <!-- =================================================================== -->
+      <section id="page-rating" class="page-panel active space-y-6">
+        <!-- Mode Switcher: Income vs Net Worth -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="inline-flex p-1 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 self-start">
+            <button id="modeIncomeBtn" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-emerald-600 text-white shadow-sm">
+              Твой доход
+            </button>
+            <button id="modeWealthBtn" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+              Твоё имущество
+            </button>
+          </div>
+          <p id="modeHintText" class="text-xs text-slate-500 dark:text-slate-400">
+            Зарплата, бизнес, фриланс или любой регулярный доход
+          </p>
+        </div>
+
+        <!-- Input Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-end">
+          <div id="inputColWrapper" class="lg:col-span-6 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label for="amountInput" id="amountLabel" class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Сумма дохода
+              </label>
+              <span id="usdEquivalentBadge" class="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                ≈ $1 222 / мес
+              </span>
+            </div>
+            <div class="relative flex items-center">
+              <input
+                id="amountInput"
+                type="text"
+                inputmode="decimal"
+                value="100 000"
+                autocomplete="off"
+                placeholder="Введите сумму..."
+                class="w-full h-14 pl-4 pr-14 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none text-2xl sm:text-3xl font-mono font-bold text-slate-900 dark:text-white tabular-nums transition-all"
+              />
+              <span id="currencySymbolInside" class="absolute right-4 text-xl font-bold text-slate-400 pointer-events-none">₽</span>
+            </div>
+          </div>
+
+          <div class="lg:col-span-3 space-y-1.5">
+            <label for="currencySelect" class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Валюта</label>
+            <select id="currencySelect" class="w-full h-14 pl-3.5 pr-8 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-emerald-500 outline-none text-sm font-semibold text-slate-900 dark:text-white cursor-pointer">
+              <option value="RUB" selected>🇷🇺 RUB — Рубль (₽)</option>
+              <option value="USD">🇺🇸 USD — Доллар ($)</option>
+              <option value="EUR">🇪🇺 EUR — Евро (€)</option>
+              <option value="KZT">🇰🇿 KZT — Тенге (₸)</option>
+              <option value="UAH">🇺🇦 UAH — Гривна (₴)</option>
+              <option value="BYN">🇧🇾 BYN — Бел. рубль (Br)</option>
+              <option value="GBP">🇬🇧 GBP — Фунт (£)</option>
+              <option value="CNY">🇨🇳 CNY — Юань (¥)</option>
+              <option value="TRY">🇹🇷 TRY — Лира (₺)</option>
+            </select>
+          </div>
+
+          <div id="periodColWrapper" class="lg:col-span-3 space-y-1.5">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Период</span>
+            <div class="grid grid-cols-2 h-14 p-1 rounded-2xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-700">
+              <button id="periodMonthBtn" class="rounded-xl text-xs sm:text-sm font-bold transition-all bg-white dark:bg-emerald-500 text-slate-900 dark:text-slate-950 shadow-sm">
+                В месяц
+              </button>
+              <button id="periodYearBtn" class="rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                В год
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Presets -->
+        <div id="presetsContainer" class="flex flex-wrap items-center gap-2">
+          <!-- Populated dynamically based on mode (income / wealth) -->
+        </div>
+
+        <!-- 3D MECHANICAL ODOMETER -->
+        <div class="odo-shell rounded-3xl p-5 sm:p-7 text-center space-y-3.5">
+          <div class="flex flex-wrap items-center justify-center gap-2 text-xs uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 font-bold">
+            <span id="odoTitleLabel">Твоё место в мире по доходу</span>
+            <span id="topPercentPill" class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/35 tracking-normal font-mono">
+              ТОП 29.8%
+            </span>
+          </div>
+
+          <div id="odometerContainer" class="flex items-center justify-center flex-nowrap py-1 overflow-x-auto">
+            <!-- 10 mechanical digits -->
+          </div>
+
+          <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+            <span>из <strong id="liveWorldPopOdo" class="text-slate-900 dark:text-slate-100 font-mono tabular-nums inline-block">8 298 979 488</strong> жителей планеты</span>
+            <span class="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+            <span id="wittyCommentary" class="text-emerald-700 dark:text-emerald-400 font-semibold"></span>
+          </div>
+        </div>
+
+        <!-- Clean 4 KPI Cards (Zero internal mechanics or countries) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="rounded-2xl bg-slate-50 dark:bg-slate-900/75 border border-slate-200/80 dark:border-slate-800 p-3.5 sm:p-4 space-y-1">
+            <div class="flex items-center justify-between text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
+              <span>Ты богаче, чем</span>
+              <i data-lucide="users" class="w-4 h-4 text-emerald-500"></i>
+            </div>
+            <div id="kpiRicherThan" class="text-lg sm:text-xl font-mono font-extrabold text-slate-900 dark:text-white tabular-nums">—</div>
+            <div id="kpiRicherPct" class="text-[11px] sm:text-xs text-emerald-600 dark:text-emerald-400 font-semibold">—</div>
+          </div>
+
+          <div class="rounded-2xl bg-slate-50 dark:bg-slate-900/75 border border-slate-200/80 dark:border-slate-800 p-3.5 sm:p-4 space-y-1">
+            <div class="flex items-center justify-between text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
+              <span>Выше тебя в мире</span>
+              <i data-lucide="arrow-up-right" class="w-4 h-4 text-amber-500"></i>
+            </div>
+            <div id="kpiAboveYou" class="text-lg sm:text-xl font-mono font-extrabold text-slate-900 dark:text-white tabular-nums">—</div>
+            <div id="kpiAbovePct" class="text-[11px] sm:text-xs text-amber-600 dark:text-amber-400 font-semibold">—</div>
+          </div>
+
+          <div class="rounded-2xl bg-slate-50 dark:bg-slate-900/75 border border-slate-200/80 dark:border-slate-800 p-3.5 sm:p-4 space-y-1">
+            <div class="flex items-center justify-between text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
+              <span>Живая шеренга</span>
+              <i data-lucide="orbit" class="w-4 h-4 text-sky-500"></i>
+            </div>
+            <div id="kpiEquator" class="text-lg sm:text-xl font-mono font-extrabold text-slate-900 dark:text-white tabular-nums">—</div>
+            <div class="text-[11px] sm:text-xs text-sky-600 dark:text-sky-400 font-medium">вокруг Земли</div>
+          </div>
+
+          <div class="rounded-2xl bg-slate-50 dark:bg-slate-900/75 border border-slate-200/80 dark:border-slate-800 p-3.5 sm:p-4 space-y-1">
+            <div class="flex items-center justify-between text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
+              <span id="kpiFourthTitle">Путь до $1 млн</span>
+              <i data-lucide="sparkles" class="w-4 h-4 text-purple-500"></i>
+            </div>
+            <div id="kpiFourthVal" class="text-lg sm:text-xl font-mono font-extrabold text-slate-900 dark:text-white tabular-nums">—</div>
+            <div id="kpiFourthSub" class="text-[11px] sm:text-xs text-purple-600 dark:text-purple-400 font-medium">—</div>
+          </div>
+        </div>
+
+        <!-- Viral CTA Row -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button id="shareFriendBtn" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition-all shadow-md shadow-emerald-600/20">
+              <i data-lucide="send" class="w-4 h-4"></i>
+              Расскажи другу — узнай, кто выше
+            </button>
+            <button id="downloadCardBtn" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-semibold text-sm transition-colors">
+              <i data-lucide="download" class="w-4 h-4 text-emerald-400"></i>
+              Карточка (PNG)
+            </button>
+            <button id="copyLinkBtn" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm border border-slate-200 dark:border-slate-700 transition-colors">
+              <i data-lucide="link-2" class="w-4 h-4"></i>
+              Ссылка-вызов
+            </button>
+          </div>
+          <span class="text-[11px] text-slate-400 dark:text-slate-500">
+            Данные не сохраняются на сервере
+          </span>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- PAGE 2: HUMAN CHAIN & WEALTH CURVE -->
+      <!-- =================================================================== -->
+      <section id="page-chain" class="page-panel space-y-6">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Твоё звено в цепочке человечества</h2>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Все жители планеты выстроены в одну очередь от № 1 до № 8,3 млрд — никто не делит одно место.</p>
+          </div>
+          <div id="chainQuickLeap" class="px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/25 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+            —
+          </div>
+        </div>
+
+        <!-- Micro Chain -->
+        <div class="rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 p-4 sm:p-6 space-y-5">
+          <div class="relative">
+            <div class="hidden md:block absolute left-8 right-8 top-1/2 -translate-y-1/2 h-1 rounded-full chain-connector opacity-80 pointer-events-none"></div>
+            <div id="microChainGrid" class="relative z-10 grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Clean Macro Planet Scale (No Country Names!) -->
+          <div class="pt-4 border-t border-slate-200/80 dark:border-slate-800 space-y-2.5">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <span class="font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Шкала всей планеты</span>
+              <span id="macroBarPositionText" class="font-mono font-bold text-emerald-600 dark:text-emerald-400">—</span>
+            </div>
+
+            <div class="relative pt-7 pb-1">
+              <div id="macroPointer" class="absolute top-0 -translate-x-1/2 transition-all duration-700 ease-out flex flex-col items-center z-20" style="left: 25%;">
+                <span class="px-2 py-0.5 rounded-md bg-emerald-600 text-white font-mono font-extrabold text-[10px] shadow-md whitespace-nowrap">
+                  ТЫ ЗДЕСЬ
+                </span>
+                <div class="w-0 h-0 border-l-[5px] border-r-[5px] border-t-[6px] border-l-transparent border-r-transparent border-t-emerald-600"></div>
+              </div>
+
+              <div class="h-4 w-full rounded-full overflow-hidden flex bg-slate-200 dark:bg-slate-800">
+                <div class="h-full bg-amber-400" style="width: 2%;"></div>
+                <div class="h-full bg-emerald-500" style="width: 13%;"></div>
+                <div class="h-full bg-sky-500" style="width: 25%;"></div>
+                <div class="h-full bg-indigo-500" style="width: 40%;"></div>
+                <div class="h-full bg-slate-400 dark:bg-slate-600" style="width: 20%;"></div>
+              </div>
+
+              <div class="flex justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-1.5">
+                <span>№ 1 (Вершина)</span>
+                <span>Экватор (~4,15 млрд)</span>
+                <span>8,30 млрд</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Global Distribution Curve Chart -->
+        <div class="rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 p-4 sm:p-6 space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <h3 id="curveChartTitle" class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Глобальная кривая распределения</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Твоя точка на общей шкале человечества</p>
+            </div>
+            <span id="curveUnitBadge" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-mono text-slate-600 dark:text-slate-300">USD / мес</span>
+          </div>
+          <div class="relative h-64 w-full">
+            <canvas id="globalCurveChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- PAGE 3: "WHAT IF?" SIMULATOR & GOAL CALCULATOR -->
+      <!-- =================================================================== -->
+      <section id="page-simulator" class="page-panel space-y-6">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Симулятор роста и цели</h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Покрути ползунок, чтобы увидеть, сколько миллионов людей ты обгонишь, или выбери желаемый Топ мира.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Multiplier Slider -->
+          <div class="lg:col-span-7 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 p-5 space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span id="simHeadingLabel" class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Рост твоего дохода</span>
+                <div class="flex items-baseline gap-2.5 mt-1">
+                  <span id="simMultiplierLabel" class="text-3xl font-mono font-extrabold text-emerald-600 dark:text-emerald-400">×2.0</span>
+                  <span id="simNewValueLabel" class="text-sm font-mono font-semibold text-slate-700 dark:text-slate-300">—</span>
+                </div>
+              </div>
+              <button id="applySimBtn" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors shadow-sm">
+                Применить к одометру
+              </button>
+            </div>
+
+            <div class="space-y-2">
+              <input id="simSlider" type="range" min="0.5" max="10" step="0.1" value="2" class="wealth-slider" />
+              <div class="flex justify-between text-[11px] font-mono text-slate-400">
+                <span>×0.5</span>
+                <span>×1.0</span>
+                <span>×2.0</span>
+                <span>×5.0</span>
+                <span>×10.0</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 p-3.5">
+                <div class="text-xs text-slate-500 dark:text-slate-400">Новое место</div>
+                <div id="simNewRank" class="text-base sm:text-lg font-mono font-extrabold text-slate-900 dark:text-white mt-1 tabular-nums">—</div>
+                <div id="simNewPct" class="text-xs text-emerald-600 dark:text-emerald-400 font-mono font-semibold mt-0.5">—</div>
+              </div>
+              <div class="rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 p-3.5">
+                <div class="text-xs text-slate-500 dark:text-slate-400">Сдвиг в очереди</div>
+                <div id="simDeltaPeople" class="text-base sm:text-lg font-mono font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">—</div>
+                <div class="text-xs text-slate-400 mt-0.5">людей пройдено</div>
+              </div>
+              <div class="rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 p-3.5">
+                <div class="text-xs text-slate-500 dark:text-slate-400">Новый статус</div>
+                <div id="simNewStatus" class="text-base font-bold text-slate-900 dark:text-white mt-1 truncate">—</div>
+                <div id="simNewStatusSub" class="text-xs text-slate-400 mt-0.5">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reverse Goal Calculator -->
+          <div class="lg:col-span-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 p-5 space-y-4">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Обратный расчёт цели</span>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white mt-0.5">Сколько нужно, чтобы попасть в...</h3>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <button data-goal-pct="50" class="goal-btn p-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-center transition-all">
+                <div class="text-xs font-extrabold text-slate-900 dark:text-white">Топ 50%</div>
+              </button>
+              <button data-goal-pct="20" class="goal-btn p-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-center transition-all">
+                <div class="text-xs font-extrabold text-slate-900 dark:text-white">Топ 20%</div>
+              </button>
+              <button data-goal-pct="10" class="goal-btn p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-500 text-center transition-all">
+                <div class="text-xs font-extrabold text-emerald-700 dark:text-emerald-300">Топ 10%</div>
+              </button>
+              <button data-goal-pct="5" class="goal-btn p-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-center transition-all">
+                <div class="text-xs font-extrabold text-slate-900 dark:text-white">Топ 5%</div>
+              </button>
+              <button data-goal-pct="1" class="goal-btn p-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-center transition-all">
+                <div class="text-xs font-extrabold text-amber-600 dark:text-amber-400">Топ 1%</div>
+              </button>
+              <button data-goal-pct="0.3" class="goal-btn p-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-center transition-all">
+                <div class="text-xs font-extrabold text-amber-600 dark:text-amber-300">Топ 0.3%</div>
+              </button>
+            </div>
+
+            <div class="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 p-4 space-y-1.5">
+              <div class="flex items-center justify-between text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                <span id="goalResultTitle">Цель: Топ 10% планеты</span>
+                <span id="goalTargetRank" class="font-mono">№ 829 897 949</span>
+              </div>
+              <div id="goalRequiredValue" class="text-xl sm:text-2xl font-mono font-extrabold text-slate-900 dark:text-white tabular-nums">—</div>
+              <div id="goalGapText" class="text-xs text-slate-600 dark:text-slate-300">—</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- PAGE 4: BATTLE / COMPARE TWO PEOPLE -->
+      <!-- =================================================================== -->
+      <section id="page-battle" class="page-panel space-y-6">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Сравнение: ты и другой человек</h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Узнай, сколько миллионов людей стоит между вами в мировой цепочке прямо сейчас.</p>
+        </div>
+
+        <div class="rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 space-y-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- You -->
+            <div class="rounded-2xl bg-white dark:bg-slate-950 border-2 border-emerald-500/50 p-4 space-y-1.5">
+              <div class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Твой результат</div>
+              <div id="battleYouAmount" class="text-xl font-mono font-extrabold text-slate-900 dark:text-white tabular-nums">—</div>
+              <div id="battleYouRank" class="text-sm font-mono font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">—</div>
+            </div>
+
+            <!-- Opponent -->
+            <div class="rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 p-4 space-y-2">
+              <div class="flex items-center justify-between">
+                <label for="battleInput" id="battleInputLabel" class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Другой человек</label>
+                <span id="battleOtherRankInline" class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 tabular-nums">—</span>
+              </div>
+              <div class="relative flex items-center">
+                <input id="battleInput" type="text" inputmode="decimal" value="250 000" class="w-full h-11 pl-3.5 pr-10 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 focus:border-amber-500 outline-none text-lg font-mono font-bold text-slate-900 dark:text-white tabular-nums" />
+                <span id="battleCurSym" class="absolute right-3.5 text-base font-bold text-slate-400">₽</span>
+              </div>
+              <div id="battlePresetsRow" class="flex flex-wrap gap-1.5 pt-1">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Big Distance Callout -->
+          <div class="rounded-2xl bg-gradient-to-r from-emerald-50 via-white to-amber-50 dark:from-emerald-500/10 dark:via-slate-950 dark:to-amber-500/10 border border-slate-200 dark:border-slate-800 p-5 text-center space-y-2">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Между вами в мировой цепочке</div>
+            <div id="battleBetweenCount" class="text-3xl sm:text-4xl font-mono font-extrabold text-slate-900 dark:text-white tabular-nums">—</div>
+            <div id="battleSummaryText" class="text-sm font-medium text-slate-600 dark:text-slate-300">—</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BOTTOM HORIZONTAL NAVIGATION BAR (Multi-page feel) -->
+    <footer class="px-4 sm:px-6 py-3 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-950/40 flex items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+      <button id="prevPageBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-200/70 dark:hover:bg-slate-800 font-semibold transition-colors disabled:opacity-35 disabled:pointer-events-none">
+        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+        <span>Назад</span>
+      </button>
+
+      <div id="pageDots" class="flex items-center gap-2">
+        <button data-page="rating" aria-label="Рейтинг" class="dot-btn w-6 h-2 rounded-full bg-emerald-600 transition-all"></button>
+        <button data-page="chain" aria-label="Цепочка" class="dot-btn w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700 transition-all"></button>
+        <button data-page="simulator" aria-label="Симулятор" class="dot-btn w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700 transition-all"></button>
+        <button data-page="battle" aria-label="Сравнить" class="dot-btn w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700 transition-all"></button>
+      </div>
+
+      <button id="nextPageBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-200/70 dark:hover:bg-slate-800 font-semibold transition-colors disabled:opacity-35 disabled:pointer-events-none">
+        <span>Дальше</span>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+      </button>
+    </footer>
+  </div>
+
+  <!-- Hidden canvas for PNG share card generation -->
+  <canvas id="shareCardCanvas" width="1200" height="630" class="hidden"></canvas>
+
+  <script>
+    // =========================================================================
+    // 1. SILENT UNDER-THE-HOOD DATA MODELS (2026 IMF / UN / UBS / Forbes)
+    //    Never exposed as country lists or raw formulas to the user.
+    // =========================================================================
+    const BASE_POP = 8298979488;
+    let liveWorldPop = BASE_POP;
+
+    const CURRENCIES = {
+      RUB: { symbol: '₽', rate: 81.84 },
+      USD: { symbol: '$', rate: 1.00 },
+      EUR: { symbol: '€', rate: 0.9112 },
+      KZT: { symbol: '₸', rate: 458.57 },
+      UAH: { symbol: '₴', rate: 45.13 },
+      BYN: { symbol: 'Br', rate: 3.00 },
+      GBP: { symbol: '£', rate: 0.7538 },
+      CNY: { symbol: '¥', rate: 6.67 },
+      TRY: { symbol: '₺', rate: 50.67 },
+    };
+
+    // --- A) INCOME MODEL (Monthly USD, IMF Oct 2026 + UN 2026 + Forbes/Capgemini 2026) ---
+    const RAW_INCOME_BANDS = [
+      { avg: 5000000, hi: 500000000, lo: 1000000, pop: 3428 },
+      { avg: 350000, hi: 1000000, lo: 150000, pop: 553422 },
+      { avg: 45000, hi: 150000, lo: 14140, pop: 24743150 },
+      { avg: 155733 / 12, pop: 690959 },
+      { avg: 127837 / 12, pop: 5525600 },
+      { avg: 124478 / 12, pop: 9154896 },
+      { avg: 115188 / 12, pop: 5646598 },
+      { avg: 109117 / 12, pop: 6208500 },
+      { avg: 95212 / 12, pop: 341784857 },
+      { avg: 82713 / 12, pop: 6044001 },
+      { avg: 78535 / 12, pop: 18192693 },
+      { avg: 75172 / 12, pop: 27921150 },
+      { avg: 72441 / 12, pop: 10296300 },
+      { avg: 69244 / 12, pop: 10621725 },
+      { avg: 67020 / 12, pop: 9228795 },
+      { avg: 65699 / 12, pop: 83298787 },
+      { avg: 64773 / 12, pop: 11947050 },
+      { avg: 63634 / 12, pop: 3370611 },
+      { avg: 61108 / 12, pop: 69487000 },
+      { avg: 60156 / 12, pop: 5664010 },
+      { avg: 60105 / 12, pop: 41798407 },
+      { avg: 57109 / 12, pop: 12063953 },
+      { avg: 51448 / 12, pop: 69081996 },
+      { avg: 45886 / 12, pop: 58949500 },
+      { avg: 43512 / 12, pop: 51088284 },
+      { avg: 41756 / 12, pop: 49935642 },
+      { avg: 39614 / 12, pop: 10903655 },
+      { avg: 36577 / 12, pop: 35300280 },
+      { avg: 35399 / 12, pop: 122430000 },
+      { avg: 34815 / 12, pop: 11424031 },
+      { avg: 31186 / 12, pop: 37221000 },
+      { avg: 29413 / 12, pop: 10372335 },
+      { avg: 27884 / 12, pop: 9488428 },
+      { avg: 24742 / 12, pop: 19041322 },
+      { avg: 21079 / 12, pop: 86092168 },
+      { avg: 19962 / 12, pop: 20150948 },
+      { avg: 19953 / 12, pop: 146028325 },
+      { avg: 19311 / 12, pop: 20633529 },
+      { avg: 17126 / 12, pop: 6532019 },
+      { avg: 16191 / 12, pop: 131231919 },
+      { avg: 16021 / 12, pop: 46466688 },
+      { avg: 15981 / 12, pop: 34389400 },
+      { avg: 15371 / 12, pop: 1404890000 },
+      { avg: 12397 / 12, pop: 214211951 },
+      { avg: 11962 / 12, pop: 9056080 },
+      { avg: 11498 / 12, pop: 34157732 },
+      { avg: 11234 / 12, pop: 3941100 },
+      { avg: 10726 / 12, pop: 53399171 },
+      { avg: 10663 / 12, pop: 3103900 },
+      { avg: 8372 / 12, pop: 70250751 },
+      { avg: 7659 / 12, pop: 63522380 },
+      { avg: 7075 / 12, pop: 32423000 },
+      { avg: 6910 / 12, pop: 47400000 },
+      { avg: 5260 / 12, pop: 102300000 },
+      { avg: 5258 / 12, pop: 46118793 },
+      { avg: 5153 / 12, pop: 290125073 },
+      { avg: 5141 / 12, pop: 37254695 },
+      { avg: 4575 / 12, pop: 39047321 },
+      { avg: 4360 / 12, pop: 114849400 },
+      { avg: 4024 / 12, pop: 108613296 },
+      { avg: 3876 / 12, pop: 38778554 },
+      { avg: 3548 / 12, pop: 87134000 },
+      { avg: 2887 / 12, pop: 169828911 },
+      { avg: 2785 / 12, pop: 54227015 },
+      { avg: 2749 / 12, pop: 1429404000 },
+      { avg: 1935 / 12, pop: 241499431 },
+      { avg: 1594 / 12, pop: 223800000 },
+      { avg: 1507 / 12, pop: 51375327 },
+      { avg: 1453 / 12, pop: 45905417 },
+      { avg: 1325 / 12, pop: 70038850 },
+      { avg: 1111 / 12, pop: 111652998 },
+      { avg: 1111 / 12, pop: 116452162 },
+      { avg: 642 / 12, pop: 15786898 },
+      { avg: 597 / 12, pop: 53282719 },
+      { avg: 510 / 12, pop: 12332788 },
+      { avg: 448 / 12, pop: 43844000 },
+    ];
+
+    function buildContinuousBands(raw, bottomBands) {
+      const list = raw.map(b => ({ ...b }));
+      const used = list.reduce((s, b) => s + b.pop, 0);
+      const rem = Math.max(0, BASE_POP - used);
+      bottomBands(rem).forEach(b => list.push(b));
+
+      for (let i = 0; i < list.length; i++) {
+        const cur = list[i];
+        const prev = i > 0 ? list[i - 1] : null;
+        const next = i < list.length - 1 ? list[i + 1] : null;
+        cur.upperUsd = cur.hi !== undefined ? cur.hi : (prev ? prev.lowerUsd : cur.avg * 1.5);
+        if (cur.lo !== undefined) {
+          cur.lowerUsd = cur.lo;
+        } else if (next) {
+          if (next.hi !== undefined) {
+            cur.lowerUsd = next.hi;
+          } else {
+            let mid = (cur.avg + next.avg) / 2;
+            if (mid >= cur.upperUsd) mid = cur.upperUsd * 0.992;
+            cur.lowerUsd = mid;
+          }
+        } else {
+          cur.lowerUsd = 0;
+        }
+        if (cur.upperUsd <= cur.lowerUsd && i < list.length - 1) {
+          cur.lowerUsd = Math.max(0.01, cur.upperUsd * 0.995);
+        }
+      }
+
+      let cursor = 1;
+      for (const b of list) {
+        b.rankStart = cursor;
+        b.rankEnd = cursor + b.pop - 1;
+        b.stepUsd = (b.upperUsd - b.lowerUsd) / b.pop;
+        cursor += b.pop;
+      }
+      return list;
+    }
+
+    const INCOME_BANDS = buildContinuousBands(RAW_INCOME_BANDS, (rem) => {
+      const b1 = Math.min(120000000, Math.floor(rem * 0.12));
+      return [
+        { avg: 18, hi: 35, lo: 3, pop: b1 },
+        { avg: 0, hi: 3, lo: 0, pop: rem - b1 },
+      ];
+    });
+
+    // --- B) NET WORTH / ASSETS MODEL (USD, UBS Global Wealth Report 2026 + Forbes/Altrata 2026) ---
+    const RAW_WEALTH_BANDS = [
+      { avg: 12000000000, hi: 850000000000, lo: 1000000000, pop: 3428 },       // Forbes 2026 Billionaires
+      { avg: 280000000, hi: 1000000000, lo: 100000000, pop: 45000 },            // Centimillionaires
+      { avg: 52000000, hi: 100000000, lo: 30000000, pop: 508422 },              // UHNW ($30M–$100M, Altrata 556,850 total)
+      { avg: 11000000, hi: 30000000, lo: 5000000, pop: 6443150 },               // UBS 2026 (~7M adults $5M+)
+      { avg: 2100000, hi: 5000000, lo: 1000000, pop: 50500000 },                // UBS 2026 (57.5M total millionaires)
+      { avg: 480000, hi: 1000000, lo: 300000, pop: 280000000 },                 // Upper global wealth
+      { avg: 175000, hi: 300000, lo: 100000, pop: 640000000 },                  // $100K–$300K band
+      { avg: 55000, hi: 100000, lo: 30000, pop: 980000000 },                    // $30K–$100K band
+      { avg: 18000, hi: 30000, lo: 10000, pop: 1350000000 },                    // $10K–$30K band
+      { avg: 5000, hi: 10000, lo: 2500, pop: 1450000000 },                      // $2.5K–$10K band
+      { avg: 1100, hi: 2500, lo: 500, pop: 1150000000 },                        // $500–$2.5K band
+      { avg: 180, hi: 500, lo: 10, pop: 1100000000 },                           // $10–$500 band
+    ];
+
+    const WEALTH_BANDS = buildContinuousBands(RAW_WEALTH_BANDS, (rem) => [
+      { avg: 0, hi: 10, lo: 0, pop: rem },                                      // Minimal assets / children
+    ]);
+
+    function getActiveBands(mode = state.mode) {
+      return mode === 'wealth' ? WEALTH_BANDS : INCOME_BANDS;
+    }
+
+    function calculateRank(usdVal, mode = state.mode) {
+      const bands = getActiveBands(mode);
+      if (!Number.isFinite(usdVal) || usdVal <= 0) {
+        return {
+          usdVal: 0,
+          rank: liveWorldPop,
+          topPercent: 100,
+          richerThan: 0,
+          aboveYou: liveWorldPop - 1,
+        };
+      }
+      const first = bands[0];
+      if (usdVal >= first.upperUsd) {
+        return {
+          usdVal,
+          rank: 1,
+          topPercent: (1 / liveWorldPop) * 100,
+          richerThan: liveWorldPop - 1,
+          aboveYou: 0,
+        };
+      }
+      let band = bands[bands.length - 1];
+      for (let i = 0; i < bands.length; i++) {
+        if (usdVal >= bands[i].lowerUsd) {
+          band = bands[i];
+          break;
+        }
+      }
+      const rawSteps = band.stepUsd > 0 ? Math.floor((band.upperUsd - usdVal) / band.stepUsd) : 0;
+      const steps = Math.max(0, Math.min(band.pop - 1, rawSteps));
+      const baseRank = Math.max(1, Math.min(BASE_POP, band.rankStart + steps));
+      // Scale proportionally to live ticking world population
+      const rank = Math.max(1, Math.min(liveWorldPop, Math.round(baseRank * (liveWorldPop / BASE_POP))));
+      return {
+        usdVal,
+        rank,
+        topPercent: (rank / liveWorldPop) * 100,
+        richerThan: Math.max(0, liveWorldPop - rank),
+        aboveYou: Math.max(0, rank - 1),
+      };
+    }
+
+    function valueForTargetRank(targetRank, mode = state.mode) {
+      const bands = getActiveBands(mode);
+      const scaled = Math.max(1, Math.min(BASE_POP, Math.round(targetRank * (BASE_POP / liveWorldPop))));
+      for (const b of bands) {
+        if (scaled >= b.rankStart && scaled <= b.rankEnd) {
+          return Math.max(0, b.upperUsd - (scaled - b.rankStart) * b.stepUsd);
+        }
+      }
+      return 0;
+    }
+
+    // =========================================================================
+    // 2. FORMATTING & CLEAN HUMAN STATUS LABELS (Zero countries/mechanics)
+    // =========================================================================
+    function fmtInt(n) {
+      return Math.round(n).toLocaleString('ru-RU');
+    }
+    function fmtCompactPeople(n) {
+      const abs = Math.abs(n);
+      if (abs >= 1e9) return (n / 1e9).toFixed(2).replace('.', ',') + ' млрд';
+      if (abs >= 1e6) return (n / 1e6).toFixed(1).replace('.', ',') + ' млн';
+      if (abs >= 1e3) return (n / 1e3).toFixed(1).replace('.', ',') + ' тыс';
+      return fmtInt(n);
+    }
+    function fmtUsd(v) {
+      if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+      if (v >= 1e6) return '$' + (v / 1e6).toFixed(2) + 'M';
+      if (v >= 1000) return '$' + Math.round(v).toLocaleString('ru-RU');
+      if (v >= 10) return '$' + v.toFixed(0);
+      return '$' + v.toFixed(2);
+    }
+    function fmtPct(p) {
+      if (p < 0.001) return p.toFixed(5) + '%';
+      if (p < 0.1) return p.toFixed(3) + '%';
+      if (p < 10) return p.toFixed(2) + '%';
+      return p.toFixed(1) + '%';
+    }
+
+    function getStatusTier(topPercent) {
+      if (topPercent <= 0.0001) return { title: 'Мировая вершина', sub: 'Топ-0,0001% планеты' };
+      if (topPercent <= 0.3) return { title: 'Глобальная элита', sub: 'Выше 99,7% людей' };
+      if (topPercent <= 1) return { title: 'Золотой Топ-1%', sub: 'Один из ста на Земле' };
+      if (topPercent <= 5) return { title: 'Высший эшелон', sub: 'Топ-5% человечества' };
+      if (topPercent <= 15) return { title: 'Сильная позиция', sub: 'Верхняя шестая часть мира' };
+      if (topPercent <= 35) return { title: 'Уверенно выше середины', sub: 'Выше большинства планеты' };
+      if (topPercent <= 55) return { title: 'Экватор человечества', sub: 'Прямо в середине мира' };
+      return { title: 'Простор для рывка', sub: 'Каждый шаг обгоняет миллионы' };
+    }
+
+    function getWittyComment(res) {
+      if (res.usdVal <= 0) return 'Старт с нуля — вся планета впереди!';
+      if (res.topPercent <= 0.001) return 'Абсолютная вершина мировой цепочки!';
+      if (res.topPercent <= 1) return 'Ты в золотом Топ-1% всего человечества!';
+      if (res.topPercent <= 5) return 'Сильнейший результат — выше 95% планеты.';
+      if (res.topPercent <= 20) return `Уверенно в верхней пятой части человечества!`;
+      if (res.topPercent <= 50) return `Ты уже выше экватора Земли — позади ${fmtCompactPeople(res.richerThan)} чел.`;
+      return 'Отличная точка для рывка: здесь небольшой рост обгоняет миллионы людей!';
+    }
+
+    // =========================================================================
+    // 3. SOUND ENGINE (Web Audio API)
+    // =========================================================================
+    let audioCtx = null;
+    function playOdometerTick() {
+      if (!state.soundEnabled) return;
+      try {
+        if (!audioCtx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return;
+          audioCtx = new AC();
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(640 + Math.random() * 120, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.024);
+        gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.026);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.028);
+      } catch (e) {}
+    }
+
+    // =========================================================================
+    // 4. APPLICATION STATE
+    // =========================================================================
+    const PAGES = ['rating', 'chain', 'simulator', 'battle'];
+    const state = {
+      page: 'rating',
+      mode: 'income',      // 'income' | 'wealth'
+      theme: 'light',      // 'light' (DEFAULT!) | 'dark'
+      incomeAmount: 100000,
+      wealthAmount: 5000000,
+      currency: 'RUB',
+      period: 'month',     // 'month' | 'year' (used in income mode)
+      simMultiplier: 2.0,
+      goalPct: 10,
+      battleAmount: 250000,
+      soundEnabled: false,
+      lastRank: BASE_POP,
+      confettiFired: false,
+    };
+
+    function getCurrentAmount() {
+      return state.mode === 'wealth' ? state.wealthAmount : state.incomeAmount;
+    }
+    function setCurrentAmount(val) {
+      if (state.mode === 'wealth') state.wealthAmount = val;
+      else state.incomeAmount = val;
+    }
+    function getNormalizedUsd() {
+      const rate = CURRENCIES[state.currency].rate;
+      const amt = getCurrentAmount();
+      if (state.mode === 'wealth') return amt / rate;
+      return (state.period === 'year' ? amt / 12 : amt) / rate;
+    }
+
+    // =========================================================================
+    // 5. LIVE ORGANICALLY GROWING WORLD POPULATION COUNTER
+    // =========================================================================
+    function startLivePopulationTicker() {
+      function tick() {
+        // Organic small delta: mostly +1..+4, occasionally -1 (net ~+2.3 people/sec growth)
+        const r = Math.random();
+        let delta = 1;
+        if (r < 0.14) delta = -1;
+        else if (r < 0.45) delta = 1;
+        else if (r < 0.75) delta = 2;
+        else if (r < 0.93) delta = 3;
+        else delta = 4;
+
+        liveWorldPop += delta;
+        const formatted = fmtInt(liveWorldPop);
+
+        const hEl = document.getElementById('liveWorldPopHeader');
+        const oEl = document.getElementById('liveWorldPopOdo');
+        if (hEl) {
+          hEl.textContent = formatted;
+          hEl.classList.remove('pop-bump');
+          void hEl.offsetWidth;
+          hEl.classList.add('pop-bump');
+        }
+        if (oEl) oEl.textContent = formatted;
+
+        // Keep "richerThan" subtly synced with live population
+        const res = calculateRank(getNormalizedUsd());
+        const rEl = document.getElementById('kpiRicherThan');
+        if (rEl) rEl.textContent = fmtCompactPeople(res.richerThan);
+
+        const nextDelay = 520 + Math.floor(Math.random() * 480);
+        setTimeout(tick, nextDelay);
+      }
+      setTimeout(tick, 750);
+    }
+
+    // =========================================================================
+    // 6. 3D MECHANICAL ODOMETER
+    // =========================================================================
+    const ODO_DIGITS = 10;
+    function initOdometer() {
+      const container = document.getElementById('odometerContainer');
+      container.innerHTML = '';
+      for (let i = 0; i < ODO_DIGITS; i++) {
+        if (i === 1 || i === 4 || i === 7) {
+          const sep = document.createElement('div');
+          sep.className = 'odo-sep';
+          container.appendChild(sep);
+        }
+        const win = document.createElement('div');
+        win.className = 'odo-digit-window mx-[2px] sm:mx-[3px] shrink-0';
+        win.id = `odo-win-${i}`;
+        const rib = document.createElement('div');
+        rib.className = 'odo-ribbon';
+        rib.id = `odo-rib-${i}`;
+        for (let d = 0; d <= 9; d++) {
+          const cell = document.createElement('div');
+          cell.className = 'odo-cell';
+          cell.textContent = d;
+          rib.appendChild(cell);
+        }
+        win.appendChild(rib);
+        container.appendChild(win);
+      }
+    }
+
+    function updateOdometer(rank) {
+      const str = String(Math.max(1, Math.min(liveWorldPop, Math.round(rank)))).padStart(ODO_DIGITS, '0');
+      const firstNonZero = str.search(/[1-9]/);
+      for (let i = 0; i < ODO_DIGITS; i++) {
+        const digit = Number(str[i]);
+        const win = document.getElementById(`odo-win-${i}`);
+        const rib = document.getElementById(`odo-rib-${i}`);
+        if (!win || !rib) continue;
+        if (i < firstNonZero) win.classList.add('odo-dim');
+        else win.classList.remove('odo-dim');
+        rib.style.transitionDelay = `${(ODO_DIGITS - 1 - i) * 22}ms`;
+        rib.style.transform = `translateY(-${digit * 10}%)`;
+      }
+      if (Math.abs(rank - state.lastRank) > 1000) playOdometerTick();
+      state.lastRank = rank;
+    }
+
+    // =========================================================================
+    // 7. GLOBAL CURVE CHART (Adapts cleanly to Light / Dark theme)
+    // =========================================================================
+    let globalCurveChart = null;
+    function updateChart(res) {
+      const isDark = state.theme === 'dark';
+      const bands = getActiveBands();
+      const curvePoints = [];
+      for (let i = 0; i < bands.length; i++) {
+        const b = bands[i];
+        const midRank = (b.rankStart + b.rankEnd) / 2;
+        if (b.avg >= 1) {
+          curvePoints.push({ x: Number((midRank / 1e9).toFixed(3)), y: Number(b.avg.toFixed(2)) });
+        }
+      }
+      const userPoint = [{
+        x: Number((res.rank / 1e9).toFixed(3)),
+        y: Math.max(1, Number(res.usdVal.toFixed(2))),
+      }];
+
+      const textColor = isDark ? '#94A3B8' : '#64748B';
+      const gridColor = isDark ? 'rgba(148, 163, 184, 0.10)' : 'rgba(15, 23, 42, 0.07)';
+      const lineColor = isDark ? 'rgba(56, 189, 248, 0.85)' : 'rgba(14, 165, 233, 0.90)';
+      const fillColor = isDark ? 'rgba(56, 189, 248, 0.12)' : 'rgba(14, 165, 233, 0.10)';
+
+      document.getElementById('curveChartTitle').textContent = state.mode === 'wealth'
+        ? 'Глобальная кривая капитала'
+        : 'Глобальная кривая доходов';
+      document.getElementById('curveUnitBadge').textContent = state.mode === 'wealth' ? 'USD (капитал)' : 'USD / мес';
+
+      const ctx = document.getElementById('globalCurveChart').getContext('2d');
+      if (globalCurveChart) {
+        globalCurveChart.destroy();
+      }
+      globalCurveChart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+          datasets: [
+            {
+              label: 'Все жители планеты',
+              data: curvePoints,
+              showLine: true,
+              borderColor: lineColor,
+              backgroundColor: fillColor,
+              fill: true,
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.3,
+            },
+            {
+              label: 'Твоя позиция',
+              data: userPoint,
+              borderColor: '#10B981',
+              backgroundColor: '#10B981',
+              pointRadius: 8,
+              pointHoverRadius: 10,
+              pointBorderColor: isDark ? '#FFFFFF' : '#0F172A',
+              pointBorderWidth: 2.5,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          plugins: {
+            legend: {
+              labels: { color: textColor, font: { family: 'Inter', size: 11, weight: '600' } },
+            },
+            tooltip: {
+              backgroundColor: isDark ? '#0F172A' : '#1E293B',
+              titleColor: '#F8FAFC',
+              bodyColor: '#E2E8F0',
+              callbacks: {
+                label: (c) => {
+                  const p = c.raw;
+                  const unit = state.mode === 'wealth' ? '' : '/мес';
+                  return c.datasetIndex === 1
+                    ? `Ты: ${fmtUsd(p.y)}${unit} (позиция ${p.x.toFixed(2)} млрд)`
+                    : `Уровень: ${fmtUsd(p.y)}${unit} (отметка ${p.x.toFixed(2)} млрд)`;
+                },
+              },
+            },
+          },
+          scales: {
+            x: {
+              title: { display: true, text: 'Позиция в цепочке (млрд чел.)', color: textColor, font: { size: 11 } },
+              min: 0,
+              max: 8.35,
+              grid: { color: gridColor },
+              ticks: { color: textColor, font: { family: 'JetBrains Mono', size: 10 } },
+            },
+            y: {
+              type: 'logarithmic',
+              title: { display: true, text: state.mode === 'wealth' ? 'Капитал USD (Log)' : 'Доход USD/мес (Log)', color: textColor, font: { size: 11 } },
+              grid: { color: gridColor },
+              ticks: {
+                color: textColor,
+                font: { family: 'JetBrains Mono', size: 10 },
+                callback: (val) => ([1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000].includes(val) ? fmtUsd(val) : ''),
+              },
+            },
+          },
+        },
+      });
+    }
+
+    // =========================================================================
+    // 8. SUB-VIEW RENDERERS (Chain, Simulator, Goals, Battle, Presets)
+    // =========================================================================
+    function renderPresets() {
+      const box = document.getElementById('presetsContainer');
+      const presets = state.mode === 'wealth'
+        ? [
+            { val: 500000, cur: 'RUB', label: '500 тыс ₽' },
+            { val: 3000000, cur: 'RUB', label: '3 млн ₽' },
+            { val: 10000000, cur: 'RUB', label: '10 млн ₽' },
+            { val: 30000000, cur: 'RUB', label: '30 млн ₽' },
+            { val: 100000, cur: 'USD', label: '$100 000' },
+            { val: 1000000, cur: 'USD', label: '$1 000 000' },
+          ]
+        : [
+            { val: 45000, cur: 'RUB', label: '45 000 ₽' },
+            { val: 100000, cur: 'RUB', label: '100 000 ₽' },
+            { val: 250000, cur: 'RUB', label: '250 000 ₽' },
+            { val: 500000, cur: 'RUB', label: '500 000 ₽' },
+            { val: 3000, cur: 'USD', label: '$3 000' },
+            { val: 10000, cur: 'USD', label: '$10 000' },
+          ];
+
+      box.innerHTML = `<span class="text-xs text-slate-400 font-medium mr-0.5">Быстро:</span>` + presets.map(p => `
+        <button data-preset="${p.val}" data-cur="${p.cur}" class="preset-btn px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-emerald-500/15 hover:text-emerald-700 dark:hover:text-emerald-300 border border-slate-200 dark:border-slate-800 text-xs font-mono font-semibold text-slate-600 dark:text-slate-300 transition-colors">
+          ${p.label}
+        </button>
+      `).join('');
+    }
+
+    function renderMicroChain(res) {
+      const grid = document.getElementById('microChainGrid');
+      const r = res.rank;
+      const curRate = CURRENCIES[state.currency].rate;
+      const curSym = CURRENCIES[state.currency].symbol;
+      const unitLabel = state.mode === 'wealth' ? '' : '/мес';
+
+      const nodes = [
+        { offset: -2, rank: r - 2, label: 'На 2 выше' },
+        { offset: -1, rank: r - 1, label: 'Впереди тебя' },
+        { offset: 0, rank: r, label: 'ЭТО ТЫ' },
+        { offset: 1, rank: r + 1, label: 'Сразу за тобой' },
+        { offset: 2, rank: r + 2, label: 'На 2 ниже' },
+      ];
+
+      grid.innerHTML = nodes.map(n => {
+        const out = n.rank < 1 || n.rank > liveWorldPop;
+        if (n.offset === 0) {
+          return `
+            <div class="you-node-pulse rounded-2xl bg-emerald-600 text-white border-2 border-emerald-400 p-4 text-center shadow-lg">
+              <div class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-100">${n.label}</div>
+              <div class="text-base sm:text-lg font-mono font-extrabold mt-1 tabular-nums">№ ${fmtInt(n.rank)}</div>
+              <div class="text-xs font-mono text-emerald-100 mt-0.5">${fmtUsd(res.usdVal)}${unitLabel}</div>
+            </div>
+          `;
+        }
+        if (out) {
+          return `
+            <div class="rounded-2xl bg-slate-100/70 dark:bg-slate-950/50 border border-dashed border-slate-300 dark:border-slate-800 p-3.5 text-center opacity-50">
+              <div class="text-[10px] uppercase tracking-wider text-slate-400">${n.rank < 1 ? 'Вершина мира' : 'Край цепочки'}</div>
+              <div class="text-sm font-mono text-slate-400 mt-1">—</div>
+            </div>
+          `;
+        }
+        return `
+          <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5 text-center shadow-sm">
+            <div class="text-[10px] uppercase tracking-wider text-slate-400">${n.label}</div>
+            <div class="text-sm font-mono font-bold text-slate-800 dark:text-slate-200 mt-1 tabular-nums">№ ${fmtInt(n.rank)}</div>
+            <div class="text-[11px] font-medium ${n.offset < 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'} mt-0.5">
+              ${n.offset < 0 ? 'Чуть богаче' : 'Чуть ниже'}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const leapTarget = res.rank > 150000000 ? 100000000 : (res.rank > 15000000 ? 10000000 : Math.max(1, Math.floor(res.rank / 2)));
+      const newTargetRank = Math.max(1, res.rank - leapTarget);
+      const reqUsd = valueForTargetRank(newTargetRank);
+      const diffUsd = Math.max(0, reqUsd - res.usdVal);
+      const multPeriod = (state.mode === 'income' && state.period === 'year') ? 12 : 1;
+      const diffLocal = diffUsd * curRate * multPeriod;
+
+      document.getElementById('chainQuickLeap').textContent = res.rank === 1
+        ? 'Ты на 1-м месте планеты!'
+        : `+${fmtInt(diffLocal)} ${curSym} обгонят ещё ${fmtCompactPeople(leapTarget)} чел.`;
+
+      const pct = Math.max(2, Math.min(98, res.topPercent));
+      document.getElementById('macroPointer').style.left = `${pct}%`;
+      document.getElementById('macroBarPositionText').textContent = `Топ ${fmtPct(res.topPercent)} планеты`;
+    }
+
+    function updateSimulator(res) {
+      const mult = state.simMultiplier;
+      const curSym = CURRENCIES[state.currency].symbol;
+      const periodLabel = state.mode === 'wealth' ? '' : (state.period === 'year' ? '/ год' : '/ мес');
+      const amt = getCurrentAmount();
+
+      document.getElementById('simHeadingLabel').textContent = state.mode === 'wealth' ? 'Рост твоего имущества' : 'Рост твоего дохода';
+
+      const newUsd = res.usdVal * mult;
+      const newLocal = amt * mult;
+      const simRes = calculateRank(newUsd);
+      const deltaPeople = res.rank - simRes.rank;
+      const status = getStatusTier(simRes.topPercent);
+
+      document.getElementById('simMultiplierLabel').textContent = `×${mult.toFixed(1)}`;
+      document.getElementById('simNewValueLabel').textContent = `${fmtInt(newLocal)} ${curSym} ${periodLabel}`.trim();
+      document.getElementById('simNewRank').textContent = `№ ${fmtInt(simRes.rank)}`;
+      document.getElementById('simNewPct').textContent = `Топ ${fmtPct(simRes.topPercent)}`;
+
+      const deltaEl = document.getElementById('simDeltaPeople');
+      if (deltaPeople > 0) {
+        deltaEl.textContent = `+${fmtCompactPeople(deltaPeople)}`;
+        deltaEl.className = 'text-base sm:text-lg font-mono font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums';
+      } else if (deltaPeople < 0) {
+        deltaEl.textContent = `${fmtCompactPeople(deltaPeople)}`;
+        deltaEl.className = 'text-base sm:text-lg font-mono font-extrabold text-rose-500 mt-1 tabular-nums';
+      } else {
+        deltaEl.textContent = '0';
+        deltaEl.className = 'text-base sm:text-lg font-mono font-extrabold text-slate-400 mt-1 tabular-nums';
+      }
+
+      document.getElementById('simNewStatus').textContent = status.title;
+      document.getElementById('simNewStatusSub').textContent = status.sub;
+    }
+
+    function updateGoalCalculator(res) {
+      const targetRank = Math.max(1, Math.round((state.goalPct / 100) * liveWorldPop));
+      const reqUsd = valueForTargetRank(targetRank);
+      const curRate = CURRENCIES[state.currency].rate;
+      const curSym = CURRENCIES[state.currency].symbol;
+      const multPeriod = (state.mode === 'income' && state.period === 'year') ? 12 : 1;
+      const periodLabel = state.mode === 'wealth' ? '' : (state.period === 'year' ? '/ год' : '/ мес');
+      const reqLocal = reqUsd * curRate * multPeriod;
+
+      document.getElementById('goalResultTitle').textContent = `Цель: Топ ${state.goalPct}% планеты`;
+      document.getElementById('goalTargetRank').textContent = `№ ${fmtInt(targetRank)}`;
+      document.getElementById('goalRequiredValue').textContent = `${fmtInt(reqLocal)} ${curSym} ${periodLabel}`.trim();
+
+      const gapEl = document.getElementById('goalGapText');
+      if (res.usdVal >= reqUsd) {
+        gapEl.innerHTML = `<span class="text-emerald-700 dark:text-emerald-300 font-bold">Цель уже достигнута!</span> Ты выше этого порога.`;
+      } else {
+        const diffLocal = (reqUsd - res.usdVal) * curRate * multPeriod;
+        const ratio = res.usdVal > 0 ? (reqUsd / res.usdVal).toFixed(1) : '∞';
+        gapEl.textContent = `Нужно добавить +${fmtInt(diffLocal)} ${curSym} ${periodLabel} (рост в ×${ratio} раза).`;
+      }
+    }
+
+    function renderBattlePresets() {
+      const row = document.getElementById('battlePresetsRow');
+      const list = state.mode === 'wealth'
+        ? [
+            { label: 'Медиана мира ($9K)', usd: 9000 },
+            { label: 'Топ-10% ($120K)', usd: 120000 },
+            { label: 'Топ-1% ($1M)', usd: 1000000 },
+          ]
+        : [
+            { label: 'Средний мир ($1 185)', usd: 1185 },
+            { label: 'Топ-10% ($3 650)', usd: 3650 },
+            { label: 'Топ-1% ($12 000)', usd: 12000 },
+          ];
+      row.innerHTML = list.map(p => `
+        <button type="button" data-battle-usd="${p.usd}" class="battle-preset px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-amber-500/20 text-[11px] font-semibold text-slate-600 dark:text-slate-300 transition-colors">
+          ${p.label}
+        </button>
+      `).join('');
+    }
+
+    function updateBattle(res) {
+      const rate = CURRENCIES[state.currency].rate;
+      const curSym = CURRENCIES[state.currency].symbol;
+      const periodLabel = state.mode === 'wealth' ? '' : (state.period === 'year' ? '/ год' : '/ мес');
+
+      document.getElementById('battleCurSym').textContent = curSym;
+      document.getElementById('battleYouAmount').textContent = `${fmtInt(getCurrentAmount())} ${curSym} ${periodLabel}`.trim();
+      document.getElementById('battleYouRank').textContent = `№ ${fmtInt(res.rank)} · Топ ${fmtPct(res.topPercent)}`;
+
+      const otherUsd = state.mode === 'wealth'
+        ? state.battleAmount / rate
+        : (state.period === 'year' ? state.battleAmount / 12 : state.battleAmount) / rate;
+      const otherRes = calculateRank(otherUsd);
+      const diff = Math.abs(res.rank - otherRes.rank);
+
+      document.getElementById('battleOtherRankInline').textContent = `№ ${fmtInt(otherRes.rank)}`;
+      document.getElementById('battleBetweenCount').textContent = `${fmtInt(diff)} чел.`;
+
+      const sumEl = document.getElementById('battleSummaryText');
+      if (res.rank < otherRes.rank) {
+        sumEl.textContent = `Ты впереди на ${fmtCompactPeople(diff)} человек (Топ ${fmtPct(res.topPercent)} против Топ ${fmtPct(otherRes.topPercent)})!`;
+      } else if (res.rank > otherRes.rank) {
+        sumEl.textContent = `Другой человек выше тебя на ${fmtCompactPeople(diff)} человек (Топ ${fmtPct(otherRes.topPercent)}).`;
+      } else {
+        sumEl.textContent = 'Вы стоите на одном месте в мировом рейтинге!';
+      }
+    }
+
+    // =========================================================================
+    // 9. PNG SHARE CARD GENERATOR (Respects Light / Dark Theme, No Countries)
+    // =========================================================================
+    function downloadShareCard(res) {
+      const canvas = document.getElementById('shareCardCanvas');
+      const ctx = canvas.getContext('2d');
+      const W = 1200, H = 630;
+      const isDark = state.theme === 'dark';
+
+      // Background
+      const grad = ctx.createLinearGradient(0, 0, W, H);
+      if (isDark) {
+        grad.addColorStop(0, '#070A12');
+        grad.addColorStop(1, '#0F172A');
+      } else {
+        grad.addColorStop(0, '#F8FAFC');
+        grad.addColorStop(1, '#EBF1F8');
+      }
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Frame
+      ctx.fillStyle = isDark ? 'rgba(15, 23, 42, 0.85)' : '#FFFFFF';
+      ctx.beginPath();
+      ctx.roundRect(44, 44, W - 88, H - 88, 32);
+      ctx.fill();
+      ctx.strokeStyle = isDark ? 'rgba(16, 185, 129, 0.45)' : '#CBD5E1';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // Header
+      ctx.fillStyle = isDark ? '#34D399' : '#059669';
+      ctx.font = '800 24px Inter, sans-serif';
+      ctx.fillText('https://chikulev.ru/Checker_Money_Rating.html', 92, 114);
+
+      // Top-% pill
+      const pillText = `ТОП ${fmtPct(res.topPercent)} ПЛАНЕТЫ`;
+      ctx.fillStyle = isDark ? 'rgba(16, 185, 129, 0.2)' : '#D1FAE5';
+      ctx.beginPath();
+      ctx.roundRect(W - 390, 80, 298, 48, 24);
+      ctx.fill();
+      ctx.fillStyle = isDark ? '#6EE7B7' : '#047857';
+      ctx.font = '800 22px JetBrains Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(pillText, W - 241, 112);
+      ctx.textAlign = 'left';
+
+      // Subtitle
+      ctx.fillStyle = isDark ? '#94A3B8' : '#64748B';
+      ctx.font = '700 24px Inter, sans-serif';
+      ctx.fillText(state.mode === 'wealth' ? 'МОЁ МЕСТО В МИРЕ ПО ИМУЩЕСТВУ' : 'МОЁ МЕСТО В МИРЕ ПО ДОХОДУ', 92, 198);
+
+      // Big Rank
+      ctx.fillStyle = isDark ? '#FFFFFF' : '#0F172A';
+      ctx.font = '800 88px JetBrains Mono, monospace';
+      ctx.fillText(`№ ${fmtInt(res.rank)}`, 92, 302);
+
+      ctx.fillStyle = isDark ? '#94A3B8' : '#475569';
+      ctx.font = '500 26px Inter, sans-serif';
+      ctx.fillText(`из ${fmtInt(liveWorldPop)} жителей Земли`, 92, 355);
+
+      // Bottom Strip
+      ctx.fillStyle = isDark ? 'rgba(30, 41, 59, 0.7)' : '#F1F5F9';
+      ctx.beginPath();
+      ctx.roundRect(92, 415, W - 184, 122, 22);
+      ctx.fill();
+
+      const status = getStatusTier(res.topPercent);
+      ctx.fillStyle = isDark ? '#94A3B8' : '#64748B';
+      ctx.font = '700 18px Inter, sans-serif';
+      ctx.fillText('БОГАЧЕ, ЧЕМ', 132, 458);
+      ctx.fillText('СТАТУС', 520, 458);
+      ctx.fillText('А ТЫ НА КАКОМ МЕСТЕ?', 820, 458);
+
+      ctx.fillStyle = isDark ? '#34D399' : '#059669';
+      ctx.font = '800 32px JetBrains Mono, monospace';
+      ctx.fillText(`${fmtCompactPeople(res.richerThan)} чел.`, 132, 505);
+
+      ctx.fillStyle = isDark ? '#F8FAFC' : '#0F172A';
+      ctx.font = '700 26px Inter, sans-serif';
+      ctx.fillText(status.title, 520, 505);
+
+      ctx.fillStyle = isDark ? '#FBBF24' : '#D97706';
+      ctx.font = '700 22px Inter, sans-serif';
+      ctx.fillText('https://chikulev.ru/Checker_Money_Rating.html', 820, 505);
+
+      const link = document.createElement('a');
+      link.download = `checker-money-rating-${res.rank}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('Карточка PNG сохранена!');
+    }
+
+    // =========================================================================
+    // 10. MAIN REACTIVE RENDER
+    // =========================================================================
+    function renderAll() {
+      const usdVal = getNormalizedUsd();
+      const res = calculateRank(usdVal);
+      const curInfo = CURRENCIES[state.currency];
+
+      // Mode-specific labels
+      const isWealth = state.mode === 'wealth';
+      document.getElementById('amountLabel').textContent = isWealth ? 'Оценка твоего имущества (за вычетом долгов)' : 'Сумма дохода';
+      document.getElementById('modeHintText').textContent = isWealth
+        ? 'Квартира, авто, накопления, инвестиции, бизнес минус кредиты'
+        : 'Зарплата, бизнес, фриланс или любой регулярный доход';
+      document.getElementById('odoTitleLabel').textContent = isWealth
+        ? 'Твоё место в мире по имуществу'
+        : 'Твоё место в мире по доходу';
+      document.getElementById('usdEquivalentBadge').textContent = isWealth
+        ? `≈ ${fmtUsd(usdVal)}`
+        : `≈ ${fmtUsd(usdVal)} / мес`;
+      document.getElementById('currencySymbolInside').textContent = curInfo.symbol;
+
+      // Show/Hide Period selector in Wealth mode & expand input col cleanly
+      const periodCol = document.getElementById('periodColWrapper');
+      const inputCol = document.getElementById('inputColWrapper');
+      if (isWealth) {
+        periodCol.classList.add('hidden');
+        inputCol.classList.remove('lg:col-span-6');
+        inputCol.classList.add('lg:col-span-9');
+      } else {
+        periodCol.classList.remove('hidden');
+        inputCol.classList.remove('lg:col-span-9');
+        inputCol.classList.add('lg:col-span-6');
+      }
+
+      // Odometer + pills
+      updateOdometer(res.rank);
+      document.getElementById('topPercentPill').textContent = `ТОП ${fmtPct(res.topPercent)}`;
+      document.getElementById('wittyCommentary').textContent = getWittyComment(res);
+
+      // Subtle confetti on Top-1%
+      if (res.topPercent <= 1 && !state.confettiFired && typeof confetti === 'function') {
+        state.confettiFired = true;
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.65 }, colors: ['#10B981', '#F59E0B', '#0EA5E9'] });
+      } else if (res.topPercent > 1) {
+        state.confettiFired = false;
+      }
+
+      // 4 Clean KPI Cards
+      document.getElementById('kpiRicherThan').textContent = fmtCompactPeople(res.richerThan);
+      document.getElementById('kpiRicherPct').textContent = `${fmtPct(100 - res.topPercent)} планеты`;
+
+      document.getElementById('kpiAboveYou').textContent = fmtCompactPeople(res.aboveYou);
+      document.getElementById('kpiAbovePct').textContent = `${fmtPct(res.topPercent)} людей`;
+
+      const eqTurns = (res.richerThan * 0.5) / 40075000;
+      document.getElementById('kpiEquator').textContent = eqTurns >= 1
+        ? `${eqTurns.toFixed(1).replace('.', ',')}×`
+        : `${Math.round((res.richerThan * 0.5) / 1000).toLocaleString('ru-RU')} км`;
+
+      const k4Title = document.getElementById('kpiFourthTitle');
+      const k4Val = document.getElementById('kpiFourthVal');
+      const k4Sub = document.getElementById('kpiFourthSub');
+      if (isWealth) {
+        k4Title.textContent = 'К медиане мира';
+        const med = 9000; // UBS 2026 global median adult net worth ~$9,000
+        const ratio = usdVal / med;
+        k4Val.textContent = ratio >= 1 ? `${ratio.toFixed(1).replace('.', ',')}×` : `${Math.round(ratio * 100)}%`;
+        k4Sub.textContent = ratio >= 1 ? 'выше медианы ($9K)' : 'от медианы ($9K)';
+      } else {
+        k4Title.textContent = 'Путь до $1 млн';
+        if (usdVal <= 0) {
+          k4Val.textContent = '—';
+          k4Sub.textContent = 'введите доход';
+        } else {
+          const months = 1000000 / usdVal;
+          if (months < 1) {
+            k4Val.textContent = `${Math.max(1, Math.round(months * 30))} дн.`;
+            k4Sub.textContent = 'меньше месяца';
+          } else if (months < 24) {
+            k4Val.textContent = `${months.toFixed(1).replace('.', ',')} мес.`;
+            k4Sub.textContent = 'при текущем доходе';
+          } else {
+            k4Val.textContent = `${(months / 12).toFixed(1).replace('.', ',')} лет`;
+            k4Sub.textContent = 'при текущем доходе';
+          }
+        }
+      }
+
+      // Sync other pages
+      renderMicroChain(res);
+      if (state.page === 'chain') updateChart(res);
+      updateSimulator(res);
+      updateGoalCalculator(res);
+      updateBattle(res);
+
+      try {
+        localStorage.setItem('cmr_v2_state', JSON.stringify({
+          theme: state.theme,
+          mode: state.mode,
+          incomeAmount: state.incomeAmount,
+          wealthAmount: state.wealthAmount,
+          currency: state.currency,
+          period: state.period,
+        }));
+      } catch (e) {}
+    }
+
+    // =========================================================================
+    // 11. NAVIGATION, THEME & EVENT BINDINGS
+    // =========================================================================
+    let toastTimer = null;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      document.getElementById('toastText').textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-3');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.add('opacity-0', 'translate-y-3'), 2600);
+    }
+
+    function copyToClipboard(text, msg) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast(msg)).catch(() => fallbackCopy(text, msg));
+      } else {
+        fallbackCopy(text, msg);
+      }
+    }
+    function fallbackCopy(text, msg) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); showToast(msg); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+
+    function parseNum(raw) {
+      const cleaned = String(raw).replace(/[^\d.,]/g, '').replace(',', '.');
+      const num = parseFloat(cleaned);
+      return Number.isFinite(num) ? Math.max(0, num) : 0;
+    }
+
+    function applyTheme(theme) {
+      state.theme = theme;
+      const html = document.documentElement;
+      if (theme === 'dark') {
+        html.classList.add('dark');
+        document.getElementById('themeBtnLabel').textContent = 'Светлая';
+      } else {
+        html.classList.remove('dark');
+        document.getElementById('themeBtnLabel').textContent = 'Тёмная';
+      }
+      if (state.page === 'chain') {
+        updateChart(calculateRank(getNormalizedUsd()));
+      }
+    }
+
+    function switchPage(pageId) {
+      if (!PAGES.includes(pageId)) return;
+      state.page = pageId;
+
+      document.querySelectorAll('.page-panel').forEach(p => {
+        p.classList.toggle('active', p.id === `page-${pageId}`);
+      });
+
+      document.querySelectorAll('.page-tab').forEach(btn => {
+        if (btn.dataset.page === pageId) {
+          btn.className = 'page-tab flex-1 lg:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm';
+        } else {
+          btn.className = 'page-tab flex-1 lg:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+        }
+      });
+
+      document.querySelectorAll('.dot-btn').forEach(dot => {
+        if (dot.dataset.page === pageId) {
+          dot.className = 'dot-btn w-6 h-2 rounded-full bg-emerald-600 transition-all';
+        } else {
+          dot.className = 'dot-btn w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700 transition-all';
+        }
+      });
+
+      const idx = PAGES.indexOf(pageId);
+      document.getElementById('prevPageBtn').disabled = idx === 0;
+      document.getElementById('nextPageBtn').disabled = idx === PAGES.length - 1;
+
+      if (pageId === 'chain') {
+        setTimeout(() => updateChart(calculateRank(getNormalizedUsd())), 40);
+      }
+    }
+
+    function syncModeButtons() {
+      const iBtn = document.getElementById('modeIncomeBtn');
+      const wBtn = document.getElementById('modeWealthBtn');
+      if (state.mode === 'income') {
+        iBtn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-emerald-600 text-white shadow-sm';
+        wBtn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+      } else {
+        wBtn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-emerald-600 text-white shadow-sm';
+        iBtn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+      }
+    }
+
+    function syncPeriodButtons() {
+      const mBtn = document.getElementById('periodMonthBtn');
+      const yBtn = document.getElementById('periodYearBtn');
+      if (state.period === 'month') {
+        mBtn.className = 'rounded-xl text-xs sm:text-sm font-bold transition-all bg-white dark:bg-emerald-500 text-slate-900 dark:text-slate-950 shadow-sm';
+        yBtn.className = 'rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+      } else {
+        yBtn.className = 'rounded-xl text-xs sm:text-sm font-bold transition-all bg-white dark:bg-emerald-500 text-slate-900 dark:text-slate-950 shadow-sm';
+        mBtn.className = 'rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+      }
+    }
+
+    function initApp() {
+      initOdometer();
+
+      // Restore saved preferences (default Light theme!)
+      let loadedHash = false;
+      if (window.location.hash && window.location.hash.length > 2) {
+        try {
+          const p = new URLSearchParams(window.location.hash.slice(1));
+          const a = parseFloat(p.get('a'));
+          const c = p.get('c');
+          const m = p.get('m');
+          const per = p.get('p');
+          if (Number.isFinite(a) && a >= 0 && CURRENCIES[c]) {
+            state.mode = m === 'wealth' ? 'wealth' : 'income';
+            state.currency = c;
+            state.period = per === 'y' ? 'year' : 'month';
+            setCurrentAmount(a);
+            loadedHash = true;
+            const preview = calculateRank(getNormalizedUsd());
+            document.getElementById('challengeText').textContent =
+              `Друг занял № ${fmtInt(preview.rank)} в мире (Топ ${fmtPct(preview.topPercent)}). Введи свои цифры и проверь, кто выше!`;
+            document.getElementById('challengeBanner').classList.remove('hidden');
+          }
+        } catch (e) {}
+      }
+
+      try {
+        const saved = JSON.parse(localStorage.getItem('cmr_v2_state') || 'null');
+        if (saved) {
+          if (saved.theme === 'dark' || saved.theme === 'light') state.theme = saved.theme;
+          if (!loadedHash) {
+            if (saved.mode === 'wealth' || saved.mode === 'income') state.mode = saved.mode;
+            if (Number.isFinite(saved.incomeAmount)) state.incomeAmount = saved.incomeAmount;
+            if (Number.isFinite(saved.wealthAmount)) state.wealthAmount = saved.wealthAmount;
+            if (CURRENCIES[saved.currency]) state.currency = saved.currency;
+            if (saved.period === 'year' || saved.period === 'month') state.period = saved.period;
+          }
+        }
+      } catch (e) {}
+
+      applyTheme(state.theme);
+      syncModeButtons();
+      syncPeriodButtons();
+      renderPresets();
+      renderBattlePresets();
+
+      document.getElementById('amountInput').value = Math.round(getCurrentAmount()).toLocaleString('ru-RU');
+      document.getElementById('currencySelect').value = state.currency;
+      document.getElementById('battleInput').value = Math.round(state.battleAmount).toLocaleString('ru-RU');
+
+      // Theme toggle
+      document.getElementById('themeToggleBtn').addEventListener('click', () => {
+        applyTheme(state.theme === 'light' ? 'dark' : 'light');
+        try {
+          const saved = JSON.parse(localStorage.getItem('cmr_v2_state') || '{}');
+          saved.theme = state.theme;
+          localStorage.setItem('cmr_v2_state', JSON.stringify(saved));
+        } catch (e) {}
+      });
+
+      // Sound toggle
+      document.getElementById('soundToggleBtn').addEventListener('click', () => {
+        state.soundEnabled = !state.soundEnabled;
+        const btn = document.getElementById('soundToggleBtn');
+        btn.classList.toggle('text-emerald-600', state.soundEnabled);
+        btn.classList.toggle('dark:text-emerald-400', state.soundEnabled);
+        if (state.soundEnabled) {
+          playOdometerTick();
+          showToast('Звук одометра включён');
+        } else {
+          showToast('Звук выключен');
+        }
+      });
+
+      // Page navigation (tabs, dots, prev/next, keyboard arrows)
+      document.querySelectorAll('.page-tab, .dot-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchPage(btn.dataset.page));
+      });
+      document.getElementById('prevPageBtn').addEventListener('click', () => {
+        const i = PAGES.indexOf(state.page);
+        if (i > 0) switchPage(PAGES[i - 1]);
+      });
+      document.getElementById('nextPageBtn').addEventListener('click', () => {
+        const i = PAGES.indexOf(state.page);
+        if (i < PAGES.length - 1) switchPage(PAGES[i + 1]);
+      });
+      document.addEventListener('keydown', (e) => {
+        if (document.activeElement && ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+        const i = PAGES.indexOf(state.page);
+        if (e.key === 'ArrowRight' && i < PAGES.length - 1) switchPage(PAGES[i + 1]);
+        if (e.key === 'ArrowLeft' && i > 0) switchPage(PAGES[i - 1]);
+      });
+
+      // Mode switch (Income vs Wealth)
+      document.getElementById('modeIncomeBtn').addEventListener('click', () => {
+        if (state.mode === 'income') return;
+        state.mode = 'income';
+        state.battleAmount = 250000;
+        syncModeButtons();
+        renderPresets();
+        renderBattlePresets();
+        document.getElementById('amountInput').value = Math.round(state.incomeAmount).toLocaleString('ru-RU');
+        document.getElementById('battleInput').value = state.battleAmount.toLocaleString('ru-RU');
+        renderAll();
+      });
+
+      document.getElementById('modeWealthBtn').addEventListener('click', () => {
+        if (state.mode === 'wealth') return;
+        state.mode = 'wealth';
+        state.battleAmount = 15000000;
+        syncModeButtons();
+        renderPresets();
+        renderBattlePresets();
+        document.getElementById('amountInput').value = Math.round(state.wealthAmount).toLocaleString('ru-RU');
+        document.getElementById('battleInput').value = state.battleAmount.toLocaleString('ru-RU');
+        renderAll();
+      });
+
+      // Amount input
+      document.getElementById('amountInput').addEventListener('input', (e) => {
+        setCurrentAmount(parseNum(e.target.value));
+        renderAll();
+      });
+      document.getElementById('amountInput').addEventListener('blur', (e) => {
+        const v = getCurrentAmount();
+        e.target.value = v > 0 ? Math.round(v).toLocaleString('ru-RU') : '0';
+      });
+
+      // Currency select
+      document.getElementById('currencySelect').addEventListener('change', (e) => {
+        state.currency = e.target.value;
+        renderAll();
+      });
+
+      // Period toggle
+      document.getElementById('periodMonthBtn').addEventListener('click', () => {
+        if (state.period === 'year') {
+          state.period = 'month';
+          state.incomeAmount = Math.round(state.incomeAmount / 12);
+          document.getElementById('amountInput').value = state.incomeAmount.toLocaleString('ru-RU');
+          syncPeriodButtons();
+          renderAll();
+        }
+      });
+      document.getElementById('periodYearBtn').addEventListener('click', () => {
+        if (state.period === 'month') {
+          state.period = 'year';
+          state.incomeAmount = Math.round(state.incomeAmount * 12);
+          document.getElementById('amountInput').value = state.incomeAmount.toLocaleString('ru-RU');
+          syncPeriodButtons();
+          renderAll();
+        }
+      });
+
+      // Presets delegation
+      document.getElementById('presetsContainer').addEventListener('click', (e) => {
+        const btn = e.target.closest('.preset-btn');
+        if (!btn) return;
+        state.currency = btn.dataset.cur;
+        document.getElementById('currencySelect').value = state.currency;
+        if (state.mode === 'income') {
+          state.period = 'month';
+          syncPeriodButtons();
+        }
+        const v = parseFloat(btn.dataset.preset);
+        setCurrentAmount(v);
+        document.getElementById('amountInput').value = Math.round(v).toLocaleString('ru-RU');
+        renderAll();
+      });
+
+      // Simulator slider & Apply
+      document.getElementById('simSlider').addEventListener('input', (e) => {
+        state.simMultiplier = parseFloat(e.target.value);
+        updateSimulator(calculateRank(getNormalizedUsd()));
+      });
+      document.getElementById('applySimBtn').addEventListener('click', () => {
+        const nextVal = Math.round(getCurrentAmount() * state.simMultiplier);
+        setCurrentAmount(nextVal);
+        state.simMultiplier = 1.0;
+        document.getElementById('simSlider').value = '1';
+        document.getElementById('amountInput').value = nextVal.toLocaleString('ru-RU');
+        switchPage('rating');
+        renderAll();
+        showToast('Новые цифры применены к одометру!');
+      });
+
+      // Goal buttons
+      document.querySelectorAll('.goal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.goalPct = parseFloat(btn.dataset.goalPct);
+          document.querySelectorAll('.goal-btn').forEach(b => {
+            b.className = 'goal-btn p-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-center transition-all';
+          });
+          btn.className = 'goal-btn p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-500 text-center transition-all';
+          updateGoalCalculator(calculateRank(getNormalizedUsd()));
+        });
+      });
+
+      // Battle input & presets
+      document.getElementById('battleInput').addEventListener('input', (e) => {
+        state.battleAmount = parseNum(e.target.value);
+        updateBattle(calculateRank(getNormalizedUsd()));
+      });
+      document.getElementById('battleInput').addEventListener('blur', (e) => {
+        e.target.value = state.battleAmount > 0 ? Math.round(state.battleAmount).toLocaleString('ru-RU') : '0';
+      });
+      document.getElementById('battlePresetsRow').addEventListener('click', (e) => {
+        const btn = e.target.closest('.battle-preset');
+        if (!btn) return;
+        const usd = parseFloat(btn.dataset.battleUsd);
+        const rate = CURRENCIES[state.currency].rate;
+        const mult = (state.mode === 'income' && state.period === 'year') ? 12 : 1;
+        state.battleAmount = Math.round(usd * rate * mult);
+        document.getElementById('battleInput').value = state.battleAmount.toLocaleString('ru-RU');
+        updateBattle(calculateRank(getNormalizedUsd()));
+      });
+
+      // Viral Share Buttons
+      document.getElementById('shareFriendBtn').addEventListener('click', () => {
+        const res = calculateRank(getNormalizedUsd());
+        const metricText = state.mode === 'wealth' ? 'по имуществу' : 'по доходу';
+        const msg = `🔥 Я проверил своё место в мировом рейтинге ${metricText} — я № ${fmtInt(res.rank)} из ${fmtInt(liveWorldPop)} человек на Земле (Топ ${fmtPct(res.topPercent)} планеты, богаче ${fmtCompactPeople(res.richerThan)} чел.)!\n\nА на каком месте ты? Зацени и скинь свой результат 👇\nhttps://https://chikulev.ru/Checker_Money_Rating.html/`;
+        copyToClipboard(msg, 'Статистика скопирована — отправляй другу!');
+      });
+
+      document.getElementById('downloadCardBtn').addEventListener('click', () => {
+        downloadShareCard(calculateRank(getNormalizedUsd()));
+      });
+
+      document.getElementById('copyLinkBtn').addEventListener('click', () => {
+        const hash = `#m=${state.mode}&a=${Math.round(getCurrentAmount())}&c=${state.currency}&p=${state.period === 'year' ? 'y' : 'm'}`;
+        copyToClipboard(`https://https://chikulev.ru/Checker_Money_Rating.html/${hash}`, 'Ссылка-вызов скопирована!');
+      });
+
+      document.getElementById('dismissChallengeBtn').addEventListener('click', () => {
+        document.getElementById('challengeBanner').classList.add('hidden');
+      });
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      switchPage('rating');
+      updateOdometer(BASE_POP);
+      setTimeout(() => renderAll(), 120);
+      startLivePopulationTicker();
+    }
+
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
