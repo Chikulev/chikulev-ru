@@ -8,7 +8,7 @@
   <meta property="og:title" content="Checker Money Rating — Твоё место среди 8,3 млрд людей" />
   <meta property="og:description" content="Проверь, на каком месте ты находишься среди всех жителей планеты по доходу или капиталу." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://https://chikulev.ru/Checker_Money_Rating.html/" />
+  <meta property="og:url" content="https://chikulev.ru/image/project/Checker_Money_Rating.html/" />
   <meta name="theme-color" content="#F4F6FA" />
 
   <!-- Fonts -->
@@ -1478,7 +1478,7 @@
       // Header
       ctx.fillStyle = isDark ? '#34D399' : '#059669';
       ctx.font = '800 24px Inter, sans-serif';
-      ctx.fillText('https://chikulev.ru/Checker_Money_Rating.html', 92, 114);
+      ctx.fillText('https://chikulev.ru/image/project/Checker_Money_Rating.html', 92, 114);
 
       // Top-% pill
       const pillText = `ТОП ${fmtPct(res.topPercent)} ПЛАНЕТЫ`;
@@ -1529,7 +1529,7 @@
 
       ctx.fillStyle = isDark ? '#FBBF24' : '#D97706';
       ctx.font = '700 22px Inter, sans-serif';
-      ctx.fillText('https://chikulev.ru/Checker_Money_Rating.html', 820, 505);
+      ctx.fillText('https://chikulev.ru/image/project/Checker_Money_Rating.html', 820, 505);
 
       const link = document.createElement('a');
       link.download = `checker-money-rating-${res.rank}.png`;
@@ -1975,7 +1975,7 @@
       document.getElementById('shareFriendBtn').addEventListener('click', () => {
         const res = calculateRank(getNormalizedUsd());
         const metricText = state.mode === 'wealth' ? 'по имуществу' : 'по доходу';
-        const msg = `🔥 Я проверил своё место в мировом рейтинге ${metricText} — я № ${fmtInt(res.rank)} из ${fmtInt(liveWorldPop)} человек на Земле (Топ ${fmtPct(res.topPercent)} планеты, богаче ${fmtCompactPeople(res.richerThan)} чел.)!\n\nА на каком месте ты? Зацени и скинь свой результат 👇\nhttps://https://chikulev.ru/Checker_Money_Rating.html/`;
+        const msg = `🔥 Я проверил своё место в мировом рейтинге ${metricText} — я № ${fmtInt(res.rank)} из ${fmtInt(liveWorldPop)} человек на Земле (Топ ${fmtPct(res.topPercent)} планеты, богаче ${fmtCompactPeople(res.richerThan)} чел.)!\n\nА на каком месте ты? Зацени и скинь свой результат 👇\nhttps://chikulev.ru/image/project/Checker_Money_Rating.html/`;
         copyToClipboard(msg, 'Статистика скопирована — отправляй другу!');
       });
 
@@ -1985,7 +1985,7 @@
 
       document.getElementById('copyLinkBtn').addEventListener('click', () => {
         const hash = `#m=${state.mode}&a=${Math.round(getCurrentAmount())}&c=${state.currency}&p=${state.period === 'year' ? 'y' : 'm'}`;
-        copyToClipboard(`https://https://chikulev.ru/Checker_Money_Rating.html/${hash}`, 'Ссылка-вызов скопирована!');
+        copyToClipboard(`https://chikulev.ru/image/project/Checker_Money_Rating.html/${hash}`, 'Ссылка-вызов скопирована!');
       });
 
       document.getElementById('dismissChallengeBtn').addEventListener('click', () => {
