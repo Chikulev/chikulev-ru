@@ -1985,7 +1985,7 @@
 
       document.getElementById('copyLinkBtn').addEventListener('click', () => {
         const hash = `#m=${state.mode}&a=${Math.round(getCurrentAmount())}&c=${state.currency}&p=${state.period === 'year' ? 'y' : 'm'}`;
-        copyToClipboard(`https://chikulev.ru/image/project/Checker_Money_Rating.html/${hash}`, 'Ссылка-вызов скопирована!');
+        copyToClipboard(`https://chikulev.ru/image/project/Checker_Money_Rating.html/`, 'Ссылка-вызов скопирована!');
       });
 
       document.getElementById('dismissChallengeBtn').addEventListener('click', () => {
